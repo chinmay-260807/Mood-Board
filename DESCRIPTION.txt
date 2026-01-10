@@ -1,0 +1,1 @@
+Mood Moodboard is a fun, aesthetic generator that blends random color palettes, expressive emojis, and humorous titles. Featuring tactile Web Audio feedback, drag-and-drop reordering, and clean image exports, it's the perfect companion for designers and vibe-seekers looking for instant creative inspiration in a modern, lightweight app.
