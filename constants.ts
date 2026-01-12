@@ -35,7 +35,7 @@ export const EMOJI_LIBRARY: EmojiData[] = [
   { char: "🦕", category: "animals", keywords: ["dinosaur", "blue", "old"] },
   { char: "🐈", category: "animals", keywords: ["cat", "pet", "meow"] },
   { char: "🐕", category: "animals", keywords: ["dog", "pet", "woof"] },
-  { char: "frog", category: "animals", keywords: ["frog", "green", "jump"] },
+  { char: "🐸", category: "animals", keywords: ["frog", "green", "jump"] },
   { char: "🦆", category: "animals", keywords: ["duck", "bird", "quack"] },
   { char: "🦋", category: "animals", keywords: ["butterfly", "fly", "blue"] },
   { char: "🦖", category: "animals", keywords: ["trex", "dino", "green"] },
@@ -51,9 +51,9 @@ export const EMOJI_LIBRARY: EmojiData[] = [
   { char: "🍄", category: "food", keywords: ["mushroom", "magic", "nature"] },
   { char: "🍒", category: "food", keywords: ["cherry", "fruit", "red"] },
   { char: "🥑", category: "food", keywords: ["avocado", "green", "healthy"] },
-  { char: " Ramen", category: "food", keywords: ["noodles", "ramen", "soup"] },
+  { char: "🍜", category: "food", keywords: ["noodles", "ramen", "soup"] },
   { char: "🍦", category: "food", keywords: ["ice cream", "cold", "sweet"] },
-  { char: "🥯", category: "food", keywords: ["bagel", "bread", "breakfast"] },
+  { char: " bagel ", category: "food", keywords: ["bagel", "bread", "breakfast"] },
   
   // Magic & Nature
   { char: "🌈", category: "nature", keywords: ["rainbow", "sky", "color"] },
@@ -72,7 +72,7 @@ export const EMOJI_LIBRARY: EmojiData[] = [
   { char: "💃", category: "vibes", keywords: ["dance", "party", "lady"] },
   { char: "🕺", category: "vibes", keywords: ["dance", "party", "man"] },
   { char: "🎡", category: "vibes", keywords: ["ferris wheel", "fair", "park"] },
-  { char: "🛹", category: "vibes", keywords: ["skateboard", "skate", "cool"] },
+  { char: " skateboard ", category: "vibes", keywords: ["skateboard", "skate", "cool"] },
   { char: "🕹️", category: "vibes", keywords: ["joystick", "game", "retro"] },
   { char: "📼", category: "vibes", keywords: ["vhs", "tape", "retro"] },
   { char: "💎", category: "vibes", keywords: ["gem", "diamond", "shiny"] },
@@ -82,5 +82,4 @@ export const EMOJI_LIBRARY: EmojiData[] = [
   { char: "💿", category: "vibes", keywords: ["cd", "music", "retro"] }
 ];
 
-// Fallback for older code that expects a flat list
 export const EMOJIS = EMOJI_LIBRARY.map(e => e.char);

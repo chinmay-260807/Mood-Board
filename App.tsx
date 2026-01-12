@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { RefreshCw, Lock, Unlock, Share2, Download, Trash2, Github, Heart, Image as ImageIcon, Check, FileDown, Search, Filter, GripVertical, GripHorizontal } from 'lucide-react';
+import { RefreshCw, Lock, Unlock, Download, Trash2, Github, Heart, Image as ImageIcon, Check, FileDown, Search, GripVertical, GripHorizontal } from 'lucide-react';
 import * as htmlToImage from 'html-to-image';
-import { MoodState, ColorItem, EmojiItem, SavedMood, EmojiData } from './types';
+import { MoodState, ColorItem, EmojiItem, SavedMood } from './types';
 import { generateTitle, generateColors, generateEmojis } from './services/moodGenerator';
 import { audioService } from './services/audioService';
 import { EMOJI_LIBRARY } from './constants';
@@ -64,19 +64,16 @@ const App: React.FC = () => {
   const [exportingFormat, setExportingFormat] = useState<'png' | 'jpeg' | null>(null);
   const [showSavedFeedback, setShowSavedFeedback] = useState(false);
   
-  // Emoji Filtering State
   const [emojiSearch, setEmojiSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [hoveredEmojiId, setHoveredEmojiId] = useState<string | null>(null);
 
-  // Drag and Drop State
   const [draggedColorIndex, setDraggedColorIndex] = useState<number | null>(null);
   const [draggedEmojiIndex, setDraggedEmojiIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   
   const boardRef = useRef<HTMLDivElement>(null);
 
-  // Persistence
   useEffect(() => {
     const stored = localStorage.getItem('mood_history');
     if (stored) {
@@ -105,7 +102,6 @@ const App: React.FC = () => {
     initMood();
   }, [initMood]);
 
-  // Reordering Logic
   const reorder = (list: any[], startIndex: number, endIndex: number) => {
     const result = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
@@ -176,7 +172,7 @@ const App: React.FC = () => {
     if (!mood) return;
     audioService.playMagicWhoosh();
     
-    setMood({
+    const nextMood: MoodState = {
       title: mood.isTitleLocked ? mood.title : generateTitle(),
       isTitleLocked: mood.isTitleLocked,
       colors: mood.colors.map(c => c.isLocked ? c : { ...c, hex: `hsl(${Math.random() * 360}, ${60 + Math.random() * 30}%, ${40 + Math.random() * 20}%)` }),
@@ -188,7 +184,8 @@ const App: React.FC = () => {
         })[0];
         return { ...e, char: available.char };
       })
-    });
+    };
+    setMood(nextMood);
   };
 
   const handleDarkModeToggle = () => {
@@ -204,7 +201,7 @@ const App: React.FC = () => {
       id: Math.random().toString(36).substr(2, 9),
       timestamp: Date.now()
     };
-    setSavedMoods([newSave, ...savedMoods].slice(0, 10)); // Keep last 10
+    setSavedMoods([newSave, ...savedMoods].slice(0, 10));
     setShowSavedFeedback(true);
     setTimeout(() => setShowSavedFeedback(false), 2000);
   };
@@ -216,7 +213,7 @@ const App: React.FC = () => {
     
     try {
       const filter = (node: HTMLElement) => {
-        const exclusionClasses = ['md:opacity-0', 'group-hover:opacity-100', 'bg-black/10', 'export-hide'];
+        const exclusionClasses = ['md:opacity-0', 'group-hover:opacity-100', 'export-hide'];
         return !exclusionClasses.some(cls => node.classList?.contains(cls));
       };
 
@@ -279,10 +276,8 @@ const App: React.FC = () => {
 
   return (
     <div className={`min-h-screen transition-colors duration-500 relative ${isDarkMode ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'}`}>
-      {/* Dynamic Background */}
       <AnimatedBackground colors={mood.colors} isDarkMode={isDarkMode} />
 
-      {/* Header */}
       <nav className="p-6 flex justify-between items-center max-w-6xl mx-auto relative z-10">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center shadow-lg transform rotate-6">
@@ -323,28 +318,26 @@ const App: React.FC = () => {
       <main className="max-w-6xl mx-auto px-6 py-8 relative z-10">
         <div className="flex flex-col gap-12">
           
-          {/* Main Content Area Refed for Export */}
           <div ref={boardRef} className="p-8 md:p-12 rounded-[3rem] transition-colors bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl shadow-2xl border border-white/50 dark:border-slate-800/50">
-            <div className="flex flex-col gap-12">
-               {/* Title Section */}
+            <div className="flex flex-col gap-8">
               <div className="text-center space-y-4">
                 <div className="inline-flex items-center gap-4 group">
                   <h2 className="text-5xl md:text-8xl font-black italic tracking-tighter">
                     "{mood.title}"
                   </h2>
-                  <button 
-                    onClick={toggleLockTitle}
-                    className={`p-2 rounded-full transition-all export-hide ${mood.isTitleLocked ? 'bg-indigo-500 text-white' : 'bg-slate-200 dark:bg-slate-700 md:opacity-0 group-hover:opacity-100'}`}
-                  >
-                    {mood.isTitleLocked ? <Lock size={24} /> : <Unlock size={24} />}
-                  </button>
+                  <div className="flex flex-col gap-2 export-hide">
+                    <button 
+                      onClick={toggleLockTitle}
+                      className={`p-2 rounded-full transition-all ${mood.isTitleLocked ? 'bg-indigo-500 text-white' : 'bg-slate-200 dark:bg-slate-700 md:opacity-0 group-hover:opacity-100'}`}
+                    >
+                      {mood.isTitleLocked ? <Lock size={18} /> : <Unlock size={18} />}
+                    </button>
+                  </div>
                 </div>
-                <p className="text-slate-500 font-medium text-lg export-hide">Drag elements to reorder, tap to lock</p>
+                <p className="text-slate-400 font-medium text-lg export-hide">Drag elements to reorder, tap to lock</p>
               </div>
 
-              {/* Board Content */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Color Palette */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">Color Palette</h3>
@@ -379,7 +372,6 @@ const App: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Emojis Section with Search/Filter */}
                 <div className="space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 export-hide">
                     <div className="flex items-center gap-2">
@@ -387,7 +379,6 @@ const App: React.FC = () => {
                       <GripVertical size={14} className="text-slate-300" />
                     </div>
                     
-                    {/* Search & Filter Bar */}
                     <div className="flex items-center gap-2 bg-white dark:bg-slate-800 rounded-full px-4 py-1.5 shadow-sm border border-slate-200 dark:border-slate-700">
                       <Search size={14} className="text-slate-400" />
                       <input 
@@ -400,7 +391,6 @@ const App: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Category Pills */}
                   <div className="flex flex-wrap gap-2 export-hide">
                     {CATEGORIES.map(cat => (
                       <button
@@ -420,7 +410,6 @@ const App: React.FC = () => {
                     ))}
                   </div>
                   
-                  {/* Grid */}
                   <div className="grid grid-cols-3 gap-4 h-64 md:h-80">
                     {mood.emojis.map((emoji, idx) => (
                       <div 
@@ -473,7 +462,6 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Action Footer */}
           <div className="flex flex-col gap-10">
             <div className="flex flex-col md:flex-row items-center justify-center gap-6">
               <div className="flex gap-4">
@@ -516,7 +504,6 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Quick Export Section */}
             <div className="flex flex-col items-center gap-4 py-4">
               <h4 className="text-xs font-black uppercase tracking-[0.3em] text-slate-400">Download Creation</h4>
               <div className="flex gap-4">
@@ -540,7 +527,6 @@ const App: React.FC = () => {
             </div>
           </div>
 
-          {/* History Section */}
           {savedMoods.length > 0 && (
             <div className="space-y-6 pt-12 border-t border-slate-100 dark:border-slate-800">
               <div className="flex justify-between items-end">
@@ -589,7 +575,6 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* Footer Branding */}
       <footer className="py-12 px-6 border-t border-slate-100 dark:border-slate-800 relative z-10">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-slate-400">
           <p className="font-medium">© 2024 Mood Moodboard — Built for pure vibes.</p>
